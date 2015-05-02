@@ -110,23 +110,23 @@ class CamDesk(gtk.Window):
 	self.connect("key-press-event", self.startme)
 	self.connect("key-press-event", self.stopme)
 	self.connect("key-press-event", self.properties)
-	
-	vbox = gtk.VBox(False, 0)
-	self.add(vbox)
-	
+
 	self.movie_window = gtk.DrawingArea()
-	vbox.add(self.movie_window)
+	self.movie_window.set_double_buffered(False)
+
+	self.add(self.movie_window)
 	self.show_all()
 
 	# Set up the gstreamer pipeline
-	self.player = gst.parse_launch ("v4l2src ! autovideosink")
-	self.player.set_state(gst.STATE_PLAYING)
+	self.player = gst.parse_launch ("v4l2src ! videoflip method=horizontal-flip ! autovideosink")
 
 	bus = self.player.get_bus()
 	bus.add_signal_watch()
 	bus.enable_sync_message_emission()
 	bus.connect("message", self.on_message)
 	bus.connect("sync-message::element", self.on_sync_message)
+
+	self.player.set_state(gst.STATE_PLAYING)
 
    def on_message(self, bus, message):
       t = message.type
