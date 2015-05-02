@@ -87,9 +87,16 @@ class CamDesk(gtk.Window):
 	 self.win.hide()
 
    def __init__(self):
-	super(CamDesk, self).__init__()
-	
+	super(CamDesk, self).__init__(gtk.WINDOW_TOPLEVEL)
+
 	self.set_position(gtk.WIN_POS_CENTER)
+
+	# display at bottom right
+	self.set_gravity(gtk.gdk.GRAVITY_SOUTH_EAST)
+	self.move(gtk.gdk.screen_width(), gtk.gdk.screen_height())
+
+	self.stick()
+
 	self.set_title("CamDesk")
 	self.set_decorated(False)
 	self.set_has_frame(False)
@@ -113,6 +120,7 @@ class CamDesk(gtk.Window):
 
 	# Set up the gstreamer pipeline
 	self.player = gst.parse_launch ("v4l2src ! autovideosink")
+	self.player.set_state(gst.STATE_PLAYING)
 
 	bus = self.player.get_bus()
 	bus.add_signal_watch()
